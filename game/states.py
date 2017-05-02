@@ -1,11 +1,13 @@
 import sys
 from random import randint
+from math import sin, cos, pi
 
 import pygame
 from pygame.locals import *
 
 from game import config
-from game.objects import RedBall
+from game.objects import RedBall, WhiteBall
+from game.vector2 import Vector2
 
 
 class State(object):
@@ -15,13 +17,10 @@ class State(object):
         if event.type == KEYDOWN and event.key == K_ESCAPE:
             sys.exit()
         if event.type == MOUSEBUTTONDOWN:
-            # 刚刚出来的小球，给一个随机的速度
-            random_speed = (randint(-400, 400), randint(-300, 0))
+            red_ball_image = pygame.image.load(config.red_ball_img).convert_alpha()
             new_ball = RedBall(event.pos,
-                            random_speed,
-                            ball_image,
-                            bounce_sound)
-            balls.append(new_ball)
+                            red_ball_image)
+            self.red_balls.append(new_ball)
 
     def firstDisplay(self, screen):
         screen.fill(config.background_color)
@@ -41,10 +40,9 @@ class Level(State):
 
         speed += (self.number - 1) * config.speed_increase
 
-        self.weight = objects.Weight(speed)
-        self.banana = objects.Banana()
-        both = self.weight, self.banana
-        self.sprites = pygame.sprite.RenderUpdates(both)
+        self.white_ball = WhiteBall()
+        all_balls = self.red_balls + [self.white_ball]
+        self.sprites = pygame.sprite.RenderUpdates(all_balls)
 
     def update(self, game):
         self.sprites.update()
@@ -57,6 +55,16 @@ class Level(State):
             self.remaining -= 1
             if self.remaining == 0:
                 game.nextState = LevelCleared(self.number)
+
+        time_passed_seconds = game.clock.tick() / 1000.
+        dead_red_balls = []
+        for red_ball in self.red_balls:
+            red_ball.update(time_passed_seconds)
+            # 每个小球的的寿命是10秒
+            if red_ball.age > 10.0:
+                dead_red_balls.append(red_ball)
+        for red_ball in dead_red_balls:
+            self.red_balls.remove(red_ball)
 
     def display(self, screen):
         screen.fill(config.background_color)

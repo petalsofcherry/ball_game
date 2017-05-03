@@ -3,11 +3,12 @@ red_ball_img = '../images/red_ball.png'
 flowers_img = '../images/flowers.png'
 collision_voice = '../sound/bounce.ogg'
 
+margin = 10
 full_screen = 1
 font_size = 48
 
 SCREEN_SIZE = 800, 600
-background_color = (0, 0, 0)
+background_color = (255, 255, 255)
 red_ball_speed = 1
 ball_level = 10
 speed_increase = 1

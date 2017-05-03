@@ -1,16 +1,13 @@
 import sys
-from random import randint
-from math import sin, cos, pi
 
 import pygame
 from pygame.locals import *
 
 from game import config
 from game.objects import RedBall, WhiteBall
-from game.vector2 import Vector2
-
 
 class State(object):
+    red_balls = []
     def handle(self, event):
         if event.type == QUIT:
             sys.exit()
@@ -18,8 +15,7 @@ class State(object):
             sys.exit()
         if event.type == MOUSEBUTTONDOWN:
             red_ball_image = pygame.image.load(config.red_ball_img).convert_alpha()
-            new_ball = RedBall(event.pos,
-                            red_ball_image)
+            new_ball = RedBall(red_ball_image)
             self.red_balls.append(new_ball)
 
     def firstDisplay(self, screen):
@@ -40,28 +36,23 @@ class Level(State):
 
         speed += (self.number - 1) * config.speed_increase
 
-        self.white_ball = WhiteBall()
-        all_balls = self.red_balls + [self.white_ball]
-        self.sprites = pygame.sprite.RenderUpdates(all_balls)
+        white_ball_image = pygame.image.load(config.white_ball_img).convert_alpha()
+        self.white_ball = WhiteBall(white_ball_image)
+        self.sprites = pygame.sprite.RenderUpdates(self.red_balls + [self.white_ball])
 
     def update(self, game):
-        self.sprites.update()
-
-        if self.white_ball.touches(self.red_ball):
-            game.nextState = GameOver()
-
-        elif self.weight.landed:
-            self.weight.reset()
-            self.remaining -= 1
-            if self.remaining == 0:
-                game.nextState = LevelCleared(self.number)
-
         time_passed_seconds = game.clock.tick() / 1000.
+        self.sprites.update(time_passed_seconds)
+
+        for red_ball in self.red_balls:
+            if self.white_ball.touches(red_ball):
+                game.nextState = GameOver()
+
+
         dead_red_balls = []
         for red_ball in self.red_balls:
-            red_ball.update(time_passed_seconds)
-            # 每个小球的的寿命是10秒
-            if red_ball.age > 10.0:
+            # 每个小球的的寿命是5秒
+            if red_ball.age > 5:
                 dead_red_balls.append(red_ball)
         for red_ball in dead_red_balls:
             self.red_balls.remove(red_ball)
@@ -125,11 +116,8 @@ class Info(Paused):
 
     nextState = Level
     text = '''
-    In this game you are a banana,
-    trying to survive a course in
-    self-defense against fruit,where the
-    participants will 'defend' themselves
-    against you with a 16 ton weight.'''
+    you are a ball,
+    away from red ball'''
 
 
 class StartUp(Paused):
@@ -137,8 +125,7 @@ class StartUp(Paused):
     nextState = Info
     image = config.flowers_img
     text = '''
-    Welcome to Squish.
-    the game of Fruit Self-Defense'''
+    Welcome to hell'''
 
 
 class LevelCleared(Paused):

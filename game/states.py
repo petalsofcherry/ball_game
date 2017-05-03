@@ -1,4 +1,6 @@
+import os
 import sys
+import time
 
 import pygame
 from pygame.locals import *
@@ -6,31 +8,27 @@ from pygame.locals import *
 from game import config
 from game.objects import RedBall, WhiteBall
 
+
 class State(object):
-    red_balls = []
     def handle(self, event):
         if event.type == QUIT:
             sys.exit()
         if event.type == KEYDOWN and event.key == K_ESCAPE:
             sys.exit()
-        if event.type == MOUSEBUTTONDOWN:
-            red_ball_image = pygame.image.load(config.red_ball_img).convert_alpha()
-            new_ball = RedBall(red_ball_image)
-            self.red_balls.append(new_ball)
 
     def firstDisplay(self, screen):
         screen.fill(config.background_color)
-        pygame.display.update()
+        pygame.display.flip()
 
     def display(self, screen):
         pass
 
 
 class Level(State):
-
     def __init__(self, number=1):
         self.number = number
         self.remaining = config.ball_level
+        self.red_ball_image = pygame.image.load(config.red_ball_img).convert_alpha()
 
         speed = config.red_ball_speed
 
@@ -38,28 +36,41 @@ class Level(State):
 
         white_ball_image = pygame.image.load(config.white_ball_img).convert_alpha()
         self.white_ball = WhiteBall(white_ball_image)
-        self.sprites = pygame.sprite.RenderUpdates(self.red_balls + [self.white_ball])
+        self.red_sprites = pygame.sprite.RenderUpdates()
+        self.white_sprites = pygame.sprite.RenderUpdates(self.white_ball)
+        self.gap = 0
+        self.count = 0
 
     def update(self, game):
-        time_passed_seconds = game.clock.tick() / 1000.
-        self.sprites.update(time_passed_seconds)
+        if self.count == 10:
+            game.nextState = LevelCleared(self.number)
 
-        for red_ball in self.red_balls:
+        time_passed_seconds = game.clock.tick() / 1000.
+        self.gap += time_passed_seconds
+        if int(self.gap) == 2:
+            new_ball = RedBall(self.red_ball_image)
+            now_sprite = pygame.sprite.RenderUpdates(new_ball)
+            self.red_sprites.add(now_sprite)
+            self.gap = 0
+            self.count += 1
+
+        self.red_sprites.update(time_passed_seconds)
+        self.white_sprites.update()
+
+        for red_ball in self.red_sprites:
             if self.white_ball.touches(red_ball):
                 game.nextState = GameOver()
 
-
         dead_red_balls = []
-        for red_ball in self.red_balls:
-            # 每个小球的的寿命是5秒
+        for red_ball in self.red_sprites:
             if red_ball.age > 5:
                 dead_red_balls.append(red_ball)
         for red_ball in dead_red_balls:
-            self.red_balls.remove(red_ball)
+            self.red_sprites.remove(red_ball)
 
     def display(self, screen):
         screen.fill(config.background_color)
-        updates = self.sprites.draw(screen)
+        updates = self.red_sprites.draw(screen) + self.white_sprites.draw(screen)
         pygame.display.update(updates)
 
 

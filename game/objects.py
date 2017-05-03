@@ -39,20 +39,18 @@ class RedBall(Ball):
                                Vector2(800, randrange(0, config.SCREEN_SIZE[1])),
                                Vector2(randrange(0, config.SCREEN_SIZE[0]), 600)])
         if self.position.y == 0:
-            self.speed = Vector2(uniform(-1, 1), uniform(0, 1))
+            self.speed = Vector2(uniform(-250, 250), uniform(0, 250))
         elif self.position.y == 600:
-            self.speed = Vector2(uniform(-1, 1), uniform(-1, 0))
+            self.speed = Vector2(uniform(-250, 250), uniform(-250, 0))
         elif self.position.x == 0:
-            self.speed = Vector2(uniform(0, 1), uniform(-1, 1))
+            self.speed = Vector2(uniform(0, 250), uniform(-250, 250))
         elif self.position.x == 800:
-            self.speed = Vector2(uniform(-1, 0), uniform(-1, 1))
+            self.speed = Vector2(uniform(-250, 0), uniform(-250, 250))
 
         self.rect.centerx, self.rect.centery = self.position.x, self.position.y
 
     def update(self, time_passed):
         self.position += self.speed * time_passed
-        # 根据重力计算速度
-        self.speed.y += time_passed * config.GRAVITY
 
         self.rect.centerx, self.rect.centery = self.position.x, self.position.y
 
@@ -101,7 +99,7 @@ class WhiteBall(Ball):
         super(WhiteBall, self).__init__(image)
         self.rect.bottom = self.area.bottom
 
-    def update(self, nonsense):
+    def update(self):
         self.rect.centerx = pygame.mouse.get_pos()[0]
         self.rect.centery = pygame.mouse.get_pos()[1]
         self.rect = self.rect.clamp(self.area)

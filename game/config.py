@@ -20,8 +20,5 @@ sprite_rotation_speed = 360.
 white_ball_pad_top = 40
 white_ball_pad_side = 20
 
-# 重力因子，实际上是单位 像素/平方秒
-GRAVITY = 250.0
-
-BOUNCINESS = 1
+BOUNCINESS = 1.3
 

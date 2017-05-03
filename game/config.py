@@ -3,7 +3,7 @@ red_ball_img = '../images/red_ball.png'
 flowers_img = '../images/flowers.png'
 collision_voice = '../sound/bounce.ogg'
 
-margin = 10
+margin = 1
 full_screen = 1
 font_size = 48
 
@@ -22,6 +22,6 @@ white_ball_pad_side = 20
 
 # 重力因子，实际上是单位 像素/平方秒
 GRAVITY = 250.0
-# 弹力系数，不要超过1!
-BOUNCINESS = 0.7
+
+BOUNCINESS = 1
 

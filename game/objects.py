@@ -23,6 +23,9 @@ class Ball(pygame.sprite.Sprite):
         self.area = screen.get_rect().inflate(shrink, shrink)
         self.age = 0.0
 
+    def touches(self, other):
+        return self.rect.colliderect(other.rect)
+
 
 class RedBall(Ball):
     def __init__(self, image):
@@ -30,6 +33,7 @@ class RedBall(Ball):
         pygame.mixer.pre_init(44100, 16, 2, 1024 * 4)
         pygame.mixer.set_num_channels(8)
         self.bounce_sound = pygame.mixer.Sound(config.collision_voice)
+        self.be_bounce = False
 
         self.reset()
 
@@ -103,6 +107,3 @@ class WhiteBall(Ball):
         self.rect.centerx = pygame.mouse.get_pos()[0]
         self.rect.centery = pygame.mouse.get_pos()[1]
         self.rect = self.rect.clamp(self.area)
-
-    def touches(self, other):
-        return self.rect.colliderect(other.rect)

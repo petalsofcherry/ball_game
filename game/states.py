@@ -45,6 +45,19 @@ class Level(State):
         if self.count == 10:
             game.nextState = LevelCleared(self.number)
 
+        for a_red_ball in self.red_sprites:
+            for another_red_ball in self.red_sprites:
+                if a_red_ball is not another_red_ball and a_red_ball.touches(another_red_ball) and \
+                        not (a_red_ball.be_bounce and another_red_ball.be_bounce):
+                    a_red_ball.speed = a_red_ball.speed * (-1)
+                    another_red_ball.speed = another_red_ball.speed * (-1)
+                    a_red_ball.be_bounce = True
+                    another_red_ball.be_bounce = True
+                    a_red_ball.play_bounce_sound()
+
+        for red_ball in self.red_sprites:
+            red_ball.be_bounce = False
+
         time_passed_seconds = game.clock.tick() / 1000.
         self.gap += time_passed_seconds
         if int(self.gap) == 2:

@@ -24,7 +24,7 @@ class Game(object):
         if config.full_screen:
             flag = FULLSCREEN
         screen_size = config.SCREEN_SIZE
-        screen = pygame.display.set_mode(screen_size, 0, 32)
+        screen = pygame.display.set_mode(screen_size, flag, 32)
 
         while True:
             if self.state != self.nextState:
